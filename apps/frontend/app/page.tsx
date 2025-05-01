@@ -27,12 +27,19 @@ export default function Home() {
         </div>
 
         <div className="relative z-10">
-          <h1 className="text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+          <h1 className="text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500">
             Six
           </h1>
           <div className="max-w-xl mx-auto">
-            <p className="text-xl mb-4">One quick call with our AI. One introduction that could change everything.</p>
-            <p className="text-lg mb-8 text-muted-foreground">Low effort. High return. What do you have to lose?</p>
+            <p className="text-xl mb-1">
+              One quick call with our AI.
+            </p>
+            <p className="text-xl mb-4">
+              One introduction that could change everything.
+            </p>
+            <p className="text-lg mb-8 text-muted-foreground">
+              What do you have to lose?
+            </p>
           </div>
 
           <Link href="/signup">
@@ -42,8 +49,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-
-      
 
       {/* Chatbot Widget */}
       <div className="fixed bottom-4 right-4 z-50">

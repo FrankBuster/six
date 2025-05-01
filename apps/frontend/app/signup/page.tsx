@@ -118,7 +118,7 @@ export default function SignupPage() {
       </div>
 
       <div className="w-full max-w-md rounded-lg bg-background p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-center mb-8">Let's get to know you</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">Let's Begin</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
