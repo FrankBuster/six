@@ -157,7 +157,14 @@ async function initializeBrowser() {
       browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
-        args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--window-size=1920,1080'
+        ],
+        ignoreHTTPSErrors: true
       });
       page = await browser.newPage();
       
