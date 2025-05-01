@@ -9,7 +9,7 @@ export function ChatbotWidget() {
     // Create the chatbot element after the component mounts
     if (chatbotRef.current) {
       const chatbotElement = document.createElement("elevenlabs-convai")
-      chatbotElement.setAttribute("agent-id", "hTaZ1kVii78ORcEsNqWC")
+      chatbotElement.setAttribute("agent-id", "H6UTjQ3MVWQC1tDOdMgD")
       chatbotRef.current.appendChild(chatbotElement)
     }
 

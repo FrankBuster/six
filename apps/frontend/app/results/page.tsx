@@ -31,7 +31,7 @@ export default function Results() {
         {/* Confetti effects */}
         <Confetti />
 
-        <h1 className="text-4xl font-bold mb-4">Welcome to Series</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome to SIX</h1>
         <p className="text-lg mb-10 text-muted-foreground">Your AI friend is ready to connect</p>
 
         <div className="mb-8">

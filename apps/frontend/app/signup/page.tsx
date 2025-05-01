@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -14,9 +13,11 @@ export default function SignupPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: "",
-    gender: "",
+    gender: null as string | null,
     phone: "",
     instagram: "",
+    age: "",
+    preference: null as "dating" | "friends" | null,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,14 +25,21 @@ export default function SignupPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleGenderChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, gender: value }))
+  const handleGenderChange = (value: string | null) => {
+    setFormData((prev) => ({ ...prev, gender: value === prev.gender ? null : value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePreferenceChange = (value: "dating" | "friends" | null) => {
+    setFormData((prev) => ({ ...prev, preference: value === prev.preference ? null : value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Here you can send form data to your backend
     router.push("/loading")
-    // In a real app, you would submit the form data to your backend here
+
+    // Simulating a delay for backend processing
     setTimeout(() => {
       router.push("/questions/1")
     }, 2000)
@@ -73,6 +81,33 @@ export default function SignupPage() {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="other" id="other" />
                 <Label htmlFor="other">Other</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="age">How old are you?</Label>
+            <Input
+              type="number"
+              id="age"
+              name="age"
+              placeholder="Enter your age"
+              value={formData.age}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Looking for:</Label>
+            <RadioGroup value={formData.preference} onValueChange={handlePreferenceChange} className="flex gap-4">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="dating" id="dating" />
+                <Label htmlFor="dating">Dating</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="friends" id="friends" />
+                <Label htmlFor="friends">Friends</Label>
               </div>
             </RadioGroup>
           </div>
