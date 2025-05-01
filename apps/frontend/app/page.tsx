@@ -43,38 +43,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Video Section */}
-      <section className="w-full min-h-screen relative">
-        <video
-          ref={videoRef}
-          className="w-full h-screen object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/placeholder.svg?height=1080&width=1920"
-        >
-          <source
-            src="https://videos.pexels.com/video-files/2344549/2344549-uhd_2560_1440_25fps.mp4"
-            type="video/mp4"
-          />
-          Your browser does not support the video tag.
-        </video>
-
-        <div
-          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 ${
-            isVideoLoaded ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <div className="bg-black/50 p-8 rounded-lg text-white text-center backdrop-blur-sm">
-            <h2 className="text-4xl font-bold mb-4">Discover Series</h2>
-            <p className="mb-6">Connect with your AI friend and explore new possibilities</p>
-            <Link href="/questions/1">
-              <Button className="rounded-full bg-white text-black hover:bg-white/90">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Chatbot Widget */}
       <div className="fixed bottom-4 right-4 z-50">
