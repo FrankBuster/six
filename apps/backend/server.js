@@ -39,16 +39,16 @@ const INSTAGRAM_PASSWORD = process.env.IG_PASSWORD;
 const COOKIES_PATH = path.join(__dirname, 'cookies.json');
 
 // Twilio configuration
-const accountSid = "ACd378cd4fcf8a0f92eeac02efc35f7487";
-const authToken = "80c4a19777c18a44f25c3918aa54affe";
-const TWILIO_PHONE_NUMBER = "+19405737016";
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 const twilioClient = twilio(accountSid, authToken);
 
 // Debug Twilio configuration
 console.log('Twilio configuration:');
-console.log('TWILIO_ACCOUNT_SID exists:', !!accountSid);
-console.log('TWILIO_AUTH_TOKEN exists:', !!authToken);
-console.log('TWILIO_PHONE_NUMBER:', TWILIO_PHONE_NUMBER);
+console.log('TWILIO_ACCOUNT_SID exists:', !!process.env.TWILIO_ACCOUNT_SID);
+console.log('TWILIO_AUTH_TOKEN exists:', !!process.env.TWILIO_AUTH_TOKEN);
+console.log('TWILIO_PHONE_NUMBER exists:', !!process.env.TWILIO_PHONE_NUMBER);
 
 let browser = null;
 let page = null;
