@@ -1,9 +1,31 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+const path = require('path');
+
+// Get the absolute path to the .env file
+const envPath = path.resolve(__dirname, '.env');
+console.log('Loading .env file from:', envPath);
+
+// Check if the .env file exists
+const fs = require('fs');
+if (fs.existsSync(envPath)) {
+  console.log('.env file exists at the specified path');
+} else {
+  console.error('ERROR: .env file does not exist at the specified path');
+}
+
+// Load environment variables from .env file with explicit path
+const result = dotenv.config({ path: envPath });
+if (result.error) {
+  console.error('Error loading .env file:', result.error);
+} else {
+  console.log('.env file loaded successfully');
+}
+
 const express = require('express');
 const cors = require('cors');
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+const twilio = require('twilio');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,9 +38,25 @@ const INSTAGRAM_USERNAME = process.env.IG_USERNAME;
 const INSTAGRAM_PASSWORD = process.env.IG_PASSWORD;
 const COOKIES_PATH = path.join(__dirname, 'cookies.json');
 
+// Twilio configuration
+const accountSid = "ACd378cd4fcf8a0f92eeac02efc35f7487";
+const authToken = "80c4a19777c18a44f25c3918aa54affe";
+const TWILIO_PHONE_NUMBER = "+19405737016";
+const twilioClient = twilio(accountSid, authToken);
+
+// Debug Twilio configuration
+console.log('Twilio configuration:');
+console.log('TWILIO_ACCOUNT_SID exists:', !!accountSid);
+console.log('TWILIO_AUTH_TOKEN exists:', !!authToken);
+console.log('TWILIO_PHONE_NUMBER:', TWILIO_PHONE_NUMBER);
+
 let browser = null;
 let page = null;
 let isInitializing = false;
+
+// In-memory database for users and follow requests
+let usersDatabase = {};
+let pendingFollowRequests = {}; // In-memory storage for pending follow requests
 
 async function saveCookies(page) {
   try {
@@ -54,7 +92,6 @@ async function isLoggedIn(page) {
       timeout: 30000 
     });
     
-    // Check for login button or login form
     const loginButton = await page.$('a[href="/accounts/login/"]');
     const loginForm = await page.$('input[name="username"]');
     
@@ -63,7 +100,6 @@ async function isLoggedIn(page) {
       return false;
     }
     
-    // Check for profile button to confirm login
     const profileButton = await page.$('a[href="/' + INSTAGRAM_USERNAME + '/"]');
     if (profileButton) {
       console.log('Logged in - profile button found');
@@ -86,28 +122,23 @@ async function performLogin(page) {
       timeout: 30000 
     });
     
-    // Wait for login form
     await page.waitForSelector('input[name="username"]', { timeout: 10000 });
     console.log('Login form found, entering credentials...');
     
-    // Clear any existing text in the inputs
     await page.evaluate(() => {
       document.querySelector('input[name="username"]').value = '';
       document.querySelector('input[name="password"]').value = '';
     });
     
-    // Enter credentials
     await page.type('input[name="username"]', INSTAGRAM_USERNAME, { delay: 100 });
     await page.type('input[name="password"]', INSTAGRAM_PASSWORD, { delay: 100 });
     
-    // Click login button and wait for navigation
     console.log('Submitting login form...');
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
       page.click('button[type="submit"]')
     ]);
     
-    // Handle "Save Your Login Info?" popup
     try {
       console.log('Checking for save login info popup...');
       await page.waitForSelector('button._acan._acap._acas._aj1-', { timeout: 5000 });
@@ -117,7 +148,6 @@ async function performLogin(page) {
       console.log('No save login info popup found');
     }
 
-    // Handle "Turn on Notifications?" popup
     try {
       console.log('Checking for notifications popup...');
       await page.waitForSelector('button._a9--._a9_1', { timeout: 5000 });
@@ -127,7 +157,6 @@ async function performLogin(page) {
       console.log('No notifications popup found');
     }
 
-    // Verify login success
     const loggedIn = await isLoggedIn(page);
     if (loggedIn) {
       console.log('Login successful, saving cookies...');
@@ -168,10 +197,8 @@ async function initializeBrowser() {
       });
       page = await browser.newPage();
       
-      // Set default timeout
       page.setDefaultTimeout(30000);
       
-      // Try to load cookies first
       const cookiesLoaded = await loadCookies(page);
       let loggedIn = false;
       
@@ -181,7 +208,6 @@ async function initializeBrowser() {
         
         if (!loggedIn) {
           console.log('Cookies expired or invalid, performing fresh login...');
-          // Delete invalid cookies
           if (fs.existsSync(COOKIES_PATH)) {
             fs.unlinkSync(COOKIES_PATH);
             console.log('Deleted invalid cookies');
@@ -217,23 +243,19 @@ async function followUser(targetUsername) {
   console.log(`Attempting to follow ${targetUsername}...`);
   
   try {
-    // Ensure we're logged in before proceeding
     const loggedIn = await isLoggedIn(page);
     if (!loggedIn) {
       console.log('Session expired, re-logging in...');
       await performLogin(page);
     }
 
-    // Go to user's profile
     await page.goto(`https://www.instagram.com/${targetUsername}/`, { 
       waitUntil: 'networkidle2',
       timeout: 30000
     });
 
-    // Wait for the profile to load
     await page.waitForSelector('header section', { timeout: 10000 });
 
-    // Check if user exists
     const userNotFound = await page.evaluate(() => {
       const errorText = document.querySelector('h2')?.textContent;
       return errorText?.includes('Sorry, this page isn\'t available');
@@ -243,12 +265,11 @@ async function followUser(targetUsername) {
       throw new Error('User not found or account is private');
     }
 
-    // Try multiple selectors for the follow button
     const buttonSelectors = [
-      'button._acan._acap._acas._aj1-', // Primary follow button
-      'button._acan._acap._acas',       // Alternative follow button
-      'button[type="button"]',          // Generic button
-      'header section button'           // Fallback to any button in header
+      'button._acan._acap._acas._aj1-',
+      'button._acan._acap._acas',
+      'button[type="button"]',
+      'header section button'
     ];
 
     let followButton = null;
@@ -272,7 +293,6 @@ async function followUser(targetUsername) {
     }
 
     if (!followButton) {
-      // Check if already following
       const isFollowing = await page.evaluate(() => {
         const buttons = Array.from(document.querySelectorAll('button'));
         return buttons.some(btn => btn.textContent.toLowerCase().includes('following'));
@@ -286,11 +306,9 @@ async function followUser(targetUsername) {
       throw new Error('Could not find follow button');
     }
 
-    // Click the follow button
     await followButton.click();
     console.log('Clicked follow button');
 
-    // Wait for the button text to change
     await page.waitForFunction(
       () => {
         const buttons = Array.from(document.querySelectorAll('button'));
@@ -308,35 +326,229 @@ async function followUser(targetUsername) {
   }
 }
 
+// Check if a user has accepted our follow request
+async function checkFollowRequestAccepted(username) {
+  console.log(`Checking if ${username} has accepted our follow request...`);
+  
+  try {
+    const loggedIn = await isLoggedIn(page);
+    if (!loggedIn) {
+      console.log('Session expired, re-logging in...');
+      await performLogin(page);
+    }
+
+    await page.goto(`https://www.instagram.com/${username}/`, { 
+      waitUntil: 'networkidle2',
+      timeout: 30000
+    });
+
+    // Wait for the profile page to load
+    await page.waitForSelector('header section', { timeout: 10000 });
+
+    // First check if the account is public or we're following them
+    const isFollowing = await page.evaluate(() => {
+      // Look for "Following" button text
+      const buttons = Array.from(document.querySelectorAll('button'));
+      return buttons.some(btn => 
+        btn.textContent.toLowerCase().includes('following') || 
+        btn.textContent.toLowerCase().includes('requested')
+      );
+    });
+
+    if (!isFollowing) {
+      console.log(`We're not following ${username} anymore or something went wrong.`);
+      return false;
+    }
+
+    // Check if we can see the user's posts or content
+    const canSeeContent = await page.evaluate(() => {
+      // Check for private account indicator
+      const privateText = document.querySelector('h2')?.textContent;
+      if (privateText && privateText.includes('This Account is Private')) {
+        return false;
+      }
+      
+      // Look for post elements or stories
+      const posts = document.querySelectorAll('article') || 
+                    document.querySelectorAll('div[role="button"]') ||
+                    document.querySelectorAll('a[href*="/p/"]');
+                    
+      // Check if there's any content visible
+      return posts.length > 0 || 
+             document.body.textContent.includes('Posts') ||
+             document.body.textContent.includes('Followers') ||
+             document.body.textContent.includes('Following');
+    });
+
+    if (canSeeContent) {
+      console.log(`We can see ${username}'s content - either it's a public account or they accepted our request!`);
+      return true;
+    } else {
+      // Check if we've requested to follow but they haven't accepted yet
+      const isPending = await page.evaluate(() => {
+        return document.body.textContent.includes('Requested') || 
+               document.body.textContent.includes('This Account is Private');
+      });
+      
+      if (isPending) {
+        console.log(`We've requested to follow ${username} but they haven't accepted yet.`);
+        return false;
+      } else {
+        // If we're following and can see content, it must be accepted
+        console.log(`We're following ${username} and can see their content - request accepted!`);
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error(`Error checking follow request status for ${username}:`, error);
+    return false;
+  }
+}
+
+// Send SMS notification to user
+async function sendSMS(phoneNumber, username) {
+  // Ensure phone number is in E.164 format
+  const formattedPhone = formatPhoneNumber(phoneNumber);
+  console.log(`Attempting to send SMS to ${formattedPhone}`);
+
+  try {
+    const message = await twilioClient.messages.create({
+      body: `Hey ${username}, I'm Six! Looks like you missed my Instagram request - can you accept it real quick so I can call you :)`,
+      from: TWILIO_PHONE_NUMBER,
+      to: formattedPhone
+    });
+    console.log(`SMS sent to ${formattedPhone}, SID: ${message.sid}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    return false;
+  }
+}
+
+// Make phone call to user
+async function makePhoneCall(phoneNumber, name, instagramUsername) {
+  // Ensure phone number is in E.164 format
+  const formattedPhone = formatPhoneNumber(phoneNumber);
+  console.log(`Attempting to make call to ${formattedPhone}`);
+
+  try {
+    const call = await twilioClient.calls.create({
+      twiml: `<Response><Say>Hello ${name}, I am Six calling you from New York City, i can help you finiding your exact match.</Say></Response>`,
+      from: TWILIO_PHONE_NUMBER,
+      to: formattedPhone
+    });
+    console.log(`Call initiated to ${formattedPhone}, SID: ${call.sid}`);
+    return true;
+  } catch (error) {
+    console.error('Error making phone call:', error);
+    return false;
+  }
+}
+
+// Helper function to format phone numbers to E.164 format
+function formatPhoneNumber(phoneNumber) {
+  let cleaned = phoneNumber.replace(/\D/g, '');
+  // If it's a local 10-digit number, add default country code
+  if (cleaned.length === 10) {
+    cleaned = '91' + cleaned;
+  }
+  // Return in E.164 format
+  return '+' + cleaned;
+}
+
+function pollFollowRequests() {
+  // Poll every 2 minutes
+  setInterval(async () => {
+    console.log('Polling for follow request acceptance...');
+
+    for (const [username, userData] of Object.entries(pendingFollowRequests)) {
+      console.log(`Checking follow status for ${username}...`);
+      try {
+        await initializeBrowser();
+        
+        // Check if the user has accepted our follow request
+        const isAccepted = await checkFollowRequestAccepted(username);
+        
+        if (isAccepted) {
+          console.log(`${username} has accepted our follow request!`);
+          
+          // Get user data from our database
+          const user = usersDatabase[username];
+          
+          if (user && user.phoneNumber) {
+            console.log(`Attempting SMS to ${user.phoneNumber} for user @${username}`);
+            
+            try {
+              await sendSMS(user.phoneNumber, username);
+              console.log(`SMS successfully sent to ${user.phoneNumber}`);
+            } catch (error) {
+              console.error('SMS failed:', error.message);
+            }
+            
+            // Make phone call
+            await makePhoneCall(user.phoneNumber, user.name, username);
+            
+            console.log(`Notifications sent to ${user.name} at ${user.phoneNumber}`);
+          } else {
+            console.log(`No phone number found for ${username}`);
+          }
+          
+          // Remove from pending requests
+          delete pendingFollowRequests[username];
+        }
+      } catch (error) {
+        console.error(`Error processing follow request for ${username}:`, error);
+      }
+    }
+  }, 2 * 60 * 1000);  // Poll every 2 minutes
+}
+
+// Start polling for follow requests
+pollFollowRequests();
+
 app.post('/api/follow', async (req, res) => {
-  const { targetUsername } = req.body;
+  const { targetUsername, name, phoneNumber, gender, age, preference } = req.body;
 
   if (!targetUsername) {
     return res.status(400).json({ error: 'Username is required' });
   }
 
+  // Clean the username (remove @ if present)
+  const cleanUsername = targetUsername.replace('@', '');
+
   try {
-    // Initialize browser if not already done
     await initializeBrowser();
 
+    // Store user information in our database
+    usersDatabase[cleanUsername] = {
+      name,
+      phoneNumber,
+      gender,
+      age,
+      preference,
+      createdAt: Date.now()
+    };
+
+    // Store the follow request in memory
+    pendingFollowRequests[cleanUsername] = Date.now();
+
     // Try to follow the user
-    const success = await followUser(targetUsername);
+    const success = await followUser(cleanUsername);
 
     if (success) {
       res.json({ 
         success: true, 
-        message: `Successfully followed ${targetUsername}` 
+        message: `Successfully sent follow request to ${cleanUsername}. We'll notify you when they accept.` 
       });
     } else {
       res.status(500).json({ 
         success: false, 
-        message: `Failed to follow ${targetUsername}` 
+        message: `Failed to follow ${cleanUsername}` 
       });
     }
 
   } catch (error) {
     console.error('Error:', error);
-    // If there's an error, try to reinitialize the browser
     if (browser) {
       await browser.close();
       browser = null;
@@ -348,7 +560,6 @@ app.post('/api/follow', async (req, res) => {
   }
 });
 
-// Close browser when server shuts down
 process.on('SIGINT', async () => {
   if (browser) {
     await browser.close();

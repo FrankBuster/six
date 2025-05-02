@@ -1,23 +1,24 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
+import type React from "react"
 
 export default function SignupPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: "",
-    gender: "",
-    phoneNumber: "",
-    instagramUsername: "",
     age: "",
-    preference: "friends" as "dating" | "friends",
+    genderPreferences: "",
+    dateFriend: "",
+    phoneNumber: "",
+    instagram: "",
+    agreeToTerms: false,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,12 +28,8 @@ export default function SignupPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleGenderChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, gender: value === prev.gender ? "" : value }))
-  }
-
-  const handlePreferenceChange = (value: "dating" | "friends") => {
-    setFormData((prev) => ({ ...prev, preference: value }))
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, agreeToTerms: checked }))
   }
 
   const validateForm = () => {
@@ -45,11 +42,6 @@ export default function SignupPage() {
       newErrors.name = 'Invalid characters in name';
     }
 
-    // Gender validation
-    // Gender validation is optional
-    // No validation needed for gender as it's optional
-
-
     // Phone validation
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = 'Phone number is required';
@@ -58,8 +50,8 @@ export default function SignupPage() {
     }
 
     // Instagram validation - only check if empty
-    if (!formData.instagramUsername) {
-      newErrors.instagramUsername = 'Instagram handle is required';
+    if (!formData.instagram) {
+      newErrors.instagram = 'Instagram handle is required';
     }
 
     // Age validation
@@ -89,7 +81,12 @@ export default function SignupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          targetUsername: formData.instagramUsername.replace('@', '') // Remove @ if present
+          targetUsername: formData.instagram.replace('@', ''), // Remove @ if present
+          phoneNumber: formData.phoneNumber, // Add phone number
+          name: formData.name, // Include name for better user identification
+          age: formData.age, // Include additional user data
+          genderPreferences: formData.genderPreferences,
+          dateFriend: formData.dateFriend
         }),
       })
 
@@ -112,119 +109,145 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="absolute top-4 right-4 z-10">
-        <ThemeToggle />
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-black text-white">
+      <div className="w-full max-w-md px-4 py-8 mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="mb-4 text-4xl font-light tracking-tight">Oh, so you don&apos;t have an invite code?...</h1>
+        </div>
 
-      <div className="w-full max-w-md rounded-lg bg-background p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-center mb-8">Let's Begin</h1>
+        {error && (
+          <div className="mb-4 p-3 bg-red-900/50 text-white rounded-lg">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">What's your name?</Label>
+            <Label 
+              htmlFor="name"
+              className="block text-xl font-semibold"
+            >
+              First Name
+            </Label>
             <Input
               id="name"
               name="name"
-              placeholder="Your full name"
               value={formData.name}
               onChange={handleChange}
-              required
+              className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white text-base placeholder:text-zinc-500"
+              placeholder="Clara"
             />
-            {error && error.includes('Name is required') && <p className="text-sm text-red-500 mt-1">Name is required</p>}
-            {error && error.includes('Invalid characters in name') && <p className="text-sm text-red-500 mt-1">Invalid characters in name</p>}
           </div>
 
           <div className="space-y-2">
-            <Label>I identify as:</Label>
-            <RadioGroup value={formData.gender} onValueChange={handleGenderChange} className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="male" id="male" />
-                <Label htmlFor="male">Male</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="female" id="female" />
-                <Label htmlFor="female">Female</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="other" id="other" />
-                <Label htmlFor="other">Other</Label>
-              </div>
-            </RadioGroup>
-            {error && error.includes('Please select a gender') && <p className="text-sm text-red-500 mt-1">Please select a gender</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="age">How old are you?</Label>
+            <Label 
+              htmlFor="age" 
+              className="block text-xl font-semibold"
+            >
+              Age
+            </Label>
             <Input
-              type="number"
               id="age"
               name="age"
-              placeholder="Enter your age"
+              type="number"
               value={formData.age}
               onChange={handleChange}
-              min="18"
-              max="120"
-              required
+              className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white text-base placeholder:text-zinc-500"
+              placeholder="25"
             />
-            {error && error.includes('Age is required') && <p className="text-sm text-red-500 mt-1">Age is required</p>}
-            {error && error.includes('You must be at least 18 years old') && <p className="text-sm text-red-500 mt-1">You must be at least 18 years old</p>}
-            {error && error.includes('Please enter a valid age') && <p className="text-sm text-red-500 mt-1">Please enter a valid age</p>}
           </div>
 
           <div className="space-y-2">
-            <Label>Looking for:</Label>
-            <RadioGroup value={formData.preference} onValueChange={handlePreferenceChange} className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="dating" id="dating" />
-                <Label htmlFor="dating">Dating</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="friends" id="friends" />
-                <Label htmlFor="friends">Friends</Label>
-              </div>
-            </RadioGroup>
+            <Label 
+              htmlFor="genderPreferences" 
+              className="block text-xl font-semibold"
+            >
+              Gender 
+            </Label>
+            <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, genderPreferences: value }))}>
+              <SelectTrigger className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 text-white">
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phoneNumber">What's your phone number?</Label>
+            <Label 
+              htmlFor="dateFriend" 
+              className="block text-xl font-semibold"
+            >
+              Date / friend
+            </Label>
+            <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, dateFriend: value }))}>
+              <SelectTrigger className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 text-white">
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="friend">Friend</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label 
+              htmlFor="phoneNumber" 
+              className="block text-xl font-semibold"
+            >
+              Phone number
+            </Label>
             <Input
               id="phoneNumber"
               name="phoneNumber"
-              placeholder="+1 (000) 000-0000"
               value={formData.phoneNumber}
               onChange={handleChange}
-              required
+              className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white text-base placeholder:text-zinc-500"
+              placeholder="+33612345678"
             />
-            {error && error.includes('Phone number is required') && <p className="text-sm text-red-500 mt-1">Phone number is required</p>}
-            {error && error.includes('Invalid phone number format') && <p className="text-sm text-red-500 mt-1">Invalid phone number format</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="instagramUsername">What's your Instagram handle?</Label>
+            <Label 
+              htmlFor="instagram" 
+              className="block text-xl font-semibold"
+            >
+              Instagram username
+            </Label>
             <Input
-              id="instagramUsername"
-              name="instagramUsername"
-              placeholder="@username"
-              value={formData.instagramUsername}
+              id="instagram"
+              name="instagram"
+              value={formData.instagram}
               onChange={handleChange}
-              required
+              className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white text-base placeholder:text-zinc-500"
+              placeholder="@username"
             />
-            {error && error.includes('Instagram handle is required') && <p className="text-sm text-red-500 mt-1">Instagram handle is required</p>}
+          </div>
+          
+          <div className="flex items-center space-x-2 pt-2">
+            <Checkbox 
+              id="agreeToTerms" 
+              checked={formData.agreeToTerms}
+              onCheckedChange={handleCheckboxChange}
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            />
+            <Label 
+              htmlFor="agreeToTerms" 
+              className="text-sm text-zinc-400"
+            >
+              I agree to the terms and conditions
+            </Label>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Accepting our follow request is required for the AI to process your match accurately.
-          </p>
-
-          {error && !error.includes('Name is required') && !error.includes('Invalid characters in name') && !error.includes('Please select a gender') && !error.includes('Age is required') && !error.includes('You must be at least 18 years old') && !error.includes('Please enter a valid age') && !error.includes('Phone number is required') && !error.includes('Invalid phone number format') && !error.includes('Instagram handle is required') && <p className="text-sm text-red-500">{error}</p>}
-
-          <Button
-            type="submit"
+          <Button 
+            type="submit" 
+            className="h-12 w-full rounded-xl bg-white text-black hover:bg-gray-200 mt-4 font-semibold text-base"
             disabled={isSubmitting}
-            className="w-full rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white py-6"
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
+            {isSubmitting ? "Processing..." : "Join"}
           </Button>
         </form>
       </div>
