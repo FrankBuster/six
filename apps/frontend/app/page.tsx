@@ -12,10 +12,12 @@ export default function Home() {
   const [typingSpeed, setTypingSpeed] = useState(150)
 
   const phrases = [
-    "call with Six",
-    "introduction that can change everything",
-    "conversation that sparks connection",
-    "match made by AI, enjoyed by you",
+    
+    " introduction",
+    " call with Six",
+    
+    
+    
   ]
 
   useEffect(() => {
