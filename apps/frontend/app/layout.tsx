@@ -8,9 +8,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Series - Meet Your Next Inspiration",
+  title: "SIX Matchmaker",
   description: "The First AI Social Network",
-    generator: 'v0.dev'
+    generator: ''
 }
 
 export default function RootLayout({
