@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -74,7 +74,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Link href="/signup">
+          <Link href="/prefrence">
             <Button className="rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white px-8 py-6 text-lg h-auto mt-4">
               Start
             </Button>
