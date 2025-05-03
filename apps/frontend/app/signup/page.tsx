@@ -112,7 +112,7 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-black text-white">
       <div className="w-full max-w-md px-4 py-8 mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="mb-4 text-4xl font-light tracking-tight">Oh, so you don&apos;t have an invite code?...</h1>
+          <h1 className="mb-4 text-4xl font-light tracking-tight">I’m looking for...</h1>
         </div>
 
         {error && (
@@ -135,7 +135,7 @@ export default function SignupPage() {
               value={formData.name}
               onChange={handleChange}
               className="h-12 w-full rounded-xl border-none bg-zinc-900 text-white text-base placeholder:text-zinc-500"
-              placeholder="Clara"
+              placeholder="your name"
             />
           </div>
 
@@ -247,7 +247,7 @@ export default function SignupPage() {
             className="h-12 w-full rounded-xl bg-white text-black hover:bg-gray-200 mt-4 font-semibold text-base"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Join"}
+            {isSubmitting ? "Processing..." : "Call Me Six"}
           </Button>
         </form>
       </div>

@@ -28,17 +28,19 @@ export default function Home() {
 
         <div className="relative z-10">
           <h1 className="text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500">
-            Six
+          Six
+
           </h1>
           <div className="max-w-xl mx-auto">
             <p className="text-xl mb-1">
-              One quick call with our AI.
+            Your AI matchmaker
+          .
             </p>
             <p className="text-xl mb-4">
-              One introduction that could change everything.
+            A friend or a date — you pick
             </p>
             <p className="text-lg mb-8 text-muted-foreground">
-              What do you have to lose?
+           
             </p>
           </div>
 
