@@ -64,7 +64,7 @@ export default function Home() {
             <div className="h-16 flex items-center justify-center">
               <p className="text-xl font-medium">
                 <span>One </span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500">
+                <span className={`bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500 ${isDeleting ? 'invisible' : ''}`}>
                   {text}
                   <span className="animate-pulse text-blue-500">|</span>
                 </span>
