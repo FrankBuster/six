@@ -32,7 +32,7 @@ export default function Results() {
         <Confetti />
 
         <h1 className="text-4xl font-bold mb-4">Welcome to SIX</h1>
-        <p className="text-lg mb-10 text-muted-foreground">Your AI friend is ready to connect</p>
+        <p className="text-lg mb-10 text-muted-foreground">We’ll text when we’re ready to match you.</p>
 
         <div className="mb-8">
           <p className="text-sm text-yellow-500 font-medium">Your Color</p>
