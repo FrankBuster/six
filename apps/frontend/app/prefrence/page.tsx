@@ -30,9 +30,9 @@ export default function SelectionPage() {
         />
       </motion.div>
 
-      <h1 className="mb-8 text-xl md:text-2xl tracking-tight font-serif text-gray-800 dark:text-gray-300 transition-colors duration-300">
+      <p className="mb-1 text-xl">
         I&apos;m looking for...
-      </h1>
+      </p>
 
       <div className="mb-8 flex flex-col gap-4 w-full max-w-xs">
         {options.map((option) => (
