@@ -1,67 +1,89 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
-export default function SelectionPage() {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+export default function Home() {
+  const [text, setText] = useState("")
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [loopNum, setLoopNum] = useState(0)
+  const [typingSpeed, setTypingSpeed] = useState(150)
 
-  const options = [
-    { id: "friend", label: "A Friend" },
-    { id: "date", label: "A Date" },
+  const phrases = [
+    
+    " introduction",
+    " call with Six",
+    
+    
+    
   ]
 
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentIndex = loopNum % phrases.length
+      const fullText = phrases[currentIndex]
+
+      const updatedText = isDeleting
+        ? fullText.substring(0, text.length - 1)
+        : fullText.substring(0, text.length + 1)
+
+      setText(updatedText)
+
+      if (!isDeleting && updatedText === fullText) {
+        // Pause before starting to delete
+        setTimeout(() => setIsDeleting(true), 1000)
+      } else if (isDeleting && updatedText === "") {
+        // Move to next phrase after deletion
+        setIsDeleting(false)
+        setLoopNum(loopNum + 1)
+      }
+
+      // Speed based on typing/deleting
+      setTypingSpeed(isDeleting ? 60 : 25)
+    }
+
+    const timer = setTimeout(handleTyping, typingSpeed)
+    return () => clearTimeout(timer)
+  }, [text, isDeleting, loopNum, typingSpeed, phrases])
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center bg-white dark:bg-black transition-colors duration-300">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-        className="mb-8 w-24 h-24 md:w-32 md:h-32"
-      >
-        <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp_Image_2025-05-02_at_01.06.38_d839fae5-removebg-preview-P52XHHFvphG0yUUk5xcXsOcGzLqlQw.png"
-          alt="Logo"
-          width={128}
-          height={128}
-          className="w-full h-full object-contain"
-        />
-      </motion.div>
+    <main className="flex min-h-screen flex-col items-center">
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center min-h-screen w-full text-center px-4">
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle />
+        </div>
 
-      <div className="max-w-xl mx-auto">
-        <p className="text-xl mb-1 text-gray-700 dark:text-gray-200">I&apos;m looking for...</p>
-        
+        <div className="relative z-10">
+          <h1 className="text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500">
+            Six
+          </h1>
+          <div className="max-w-xl mx-auto">
+            <p className="text-xl mb-1">Your AI matchmaker.</p>
+            <p className="text-xl mb-4">A friend or a date — you pick</p>
+            <div className="h-16 flex items-center justify-center">
+              <p className="text-xl font-medium">
+                <span>One </span>
+                <span className={`bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500 ${isDeleting ? 'invisible' : ''}`}>
+                  {text}
+                  <span className="animate-pulse text-blue-500">|</span>
+                </span>
+              </p>
+            </div>
+          </div>
 
-       
-      </div>
+          <Link href="/prefrence">
+            <Button className="rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white px-8 py-6 text-lg h-auto mt-4">
+              Start
+            </Button>
+          </Link>
+        </div>
+      </section>
 
-      <div className="mb-8 flex flex-col gap-4 w-full max-w-xs">
-        {options.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => setSelectedOption(option.id)}
-            className={`w-full px-6 py-4 rounded-full border-2 text-xl mb-1 transition-all duration-300 ${
-              selectedOption === option.id
-                ? "border-4 border-pink-500"
-                : "border-2 border-gray-300 dark:border-gray-600 hover:border-pink-400 dark:hover:border-pink-500"
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <Link href="/results">
-        <Button
-          size="lg"
-          className="text-xl px-8 py-6 font-serif text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 rounded-full transition duration-300 ease-in-out"
-          disabled={!selectedOption}
-        >
-          Next
-        </Button>
-      </Link>
-    </div>
+      {/* Chatbot Widget */}
+      <div className="fixed bottom-4 right-4 z-50"></div>
+    </main>
   )
 }
