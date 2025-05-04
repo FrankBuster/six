@@ -12,9 +12,9 @@ export default function Home() {
   const [typingSpeed, setTypingSpeed] = useState(150)
 
   const phrases = [
-    
-    " introduction",
     " call with Six",
+    " introduction",
+    
     
     
     

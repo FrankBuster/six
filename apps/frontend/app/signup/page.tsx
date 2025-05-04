@@ -5,7 +5,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { ChevronDown } from "lucide-react"
 
-export default function Page() {
+export default function SignupPage() {
   const [formData, setFormData] = useState({
     firstName: "",
     age: "",
@@ -26,10 +26,10 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center px-4 py-4">
+    <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col items-center px-4 py-4">
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
         className="mb-4 w-20 h-20 md:w-28 md:h-28"
       >
         <Image
@@ -41,7 +41,9 @@ export default function Page() {
         />
       </motion.div>
 
-      <p className="text-center text-xl mb-4 opacity-80 -mt-2">*the only form we&apos;ll ever ask you to fill</p>
+      <p className="text-center text-xl mb-4 opacity-80 -mt-2">
+        *the only form we&apos;ll ever ask you to fill
+      </p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
         <div className="space-y-2">
@@ -52,7 +54,7 @@ export default function Page() {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="First name"
           />
         </div>
@@ -66,7 +68,7 @@ export default function Page() {
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+              className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
               placeholder="Age"
             />
           </div>
@@ -79,14 +81,14 @@ export default function Page() {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full bg-zinc-800/80 text-white px-4 pr-10 py-2 rounded-md appearance-none focus:outline-none"
+                className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white px-4 pr-10 py-2 rounded-md appearance-none focus:outline-none"
               >
                 <option value="" disabled>Select...</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black dark:text-white">
                 <ChevronDown className="w-4 h-4" />
               </div>
             </div>
@@ -101,7 +103,7 @@ export default function Page() {
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="Enter your phone number"
           />
         </div>
@@ -114,12 +116,12 @@ export default function Page() {
             name="instagram"
             value={formData.instagram}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="Accept our request for verification"
           />
         </div>
 
-        <p className="pt-1 text-xs text-zinc-400 text-center leading-relaxed px-4">
+        <p className="pt-1 text-xs text-zinc-600 dark:text-zinc-400 text-center leading-relaxed px-4">
           *Disclaimer: our matching algorithm reads between the lines and decodes your voice, tone, energy – the little
           things even your therapist wouldn't get
         </p>
