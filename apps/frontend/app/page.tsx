@@ -41,7 +41,7 @@ export default function Home() {
       }
 
       // Speed based on typing/deleting
-      setTypingSpeed(isDeleting ? 30 : 150)
+      setTypingSpeed(isDeleting ? 60 : 25)
     }
 
     const timer = setTimeout(handleTyping, typingSpeed)
