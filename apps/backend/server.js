@@ -406,6 +406,7 @@ async function checkFollowRequestAccepted(username) {
 }
 
 // Send SMS notification to user
+// Send SMS notification to user
 async function sendSMS(phoneNumber, username) {
   // Ensure phone number is in E.164 format
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -417,13 +418,15 @@ async function sendSMS(phoneNumber, username) {
       from: TWILIO_PHONE_NUMBER,
       to: formattedPhone
     });
-  
+
     console.log(`SMS sent to ${formattedPhone}, SID: ${message.sid}`);
     return true;
   } catch (error) {
     console.error('Error sending SMS:', error);
     return false;
   }
+} // ← this closing brace was missing
+
 
 
 // Helper function to format phone numbers to E.164 format
