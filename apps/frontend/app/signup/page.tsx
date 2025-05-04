@@ -132,12 +132,13 @@ export default function SignupPage() {
         </p>
 
         <div className="pt-6">
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-pink-500 to-blue-500 hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block"
-          >
-            Join
-          </button>
+        <button
+  type="submit"
+  className="bg-gradient-to-r from-pink-500 to-blue-500 text-black hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block"
+>
+  Join
+</button>
+
         </div>
       </form>
     </main>
