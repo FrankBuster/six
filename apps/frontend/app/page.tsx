@@ -1,89 +1,69 @@
-'use client';
+"use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { motion } from "framer-motion"
+import Image from "next/image"
+import { Confetti } from "@/components/ui/confetti"
 
-export default function Home() {
-  const [text, setText] = useState("")
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [loopNum, setLoopNum] = useState(0)
-  const [typingSpeed, setTypingSpeed] = useState(150)
-
-  const phrases = [
-    
-    " introduction",
-    " call with Six",
-    
-    
-    
-  ]
+export default function Results() {
+  const changingWords = ["No forms", "No quizzes", "No surveys", "No Swiping"]
+  const fixedWord = ""
+  const [wordIndex, setWordIndex] = useState(0)
+  const [fade, setFade] = useState(true)
 
   useEffect(() => {
-    const handleTyping = () => {
-      const currentIndex = loopNum % phrases.length
-      const fullText = phrases[currentIndex]
-
-      const updatedText = isDeleting
-        ? fullText.substring(0, text.length - 1)
-        : fullText.substring(0, text.length + 1)
-
-      setText(updatedText)
-
-      if (!isDeleting && updatedText === fullText) {
-        // Pause before starting to delete
-        setTimeout(() => setIsDeleting(true), 1000)
-      } else if (isDeleting && updatedText === "") {
-        // Move to next phrase after deletion
-        setIsDeleting(false)
-        setLoopNum(loopNum + 1)
-      }
-
-      // Speed based on typing/deleting
-      setTypingSpeed(isDeleting ? 30 : 150)
-    }
-
-    const timer = setTimeout(handleTyping, typingSpeed)
-    return () => clearTimeout(timer)
-  }, [text, isDeleting, loopNum, typingSpeed, phrases])
+    const interval = setInterval(() => {
+      setFade(false)
+      setTimeout(() => {
+        setWordIndex((prevIndex) => (prevIndex + 1) % changingWords.length)
+        setFade(true)
+      }, 200)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center min-h-screen w-full text-center px-4">
-        <div className="absolute top-4 right-4 z-10">
-          <ThemeToggle />
-        </div>
+    <main className="flex flex-col items-center justify-center min-h-screen px-4 text-center bg-white dark:bg-black relative">
+      {/* Confetti effect */}
+      <Confetti />
 
-        <div className="relative z-10">
-          <h1 className="text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500">
+      {/* Spinning Logo */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+        className="mb-8 w-24 h-24 md:w-32 md:h-32"
+      >
+        <Image
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp_Image_2025-05-02_at_01.06.38_d839fae5-removebg-preview-P52XHHFvphG0yUUk5xcXsOcGzLqlQw.png"
+          alt="Logo"
+          width={128}
+          height={128}
+          className="w-full h-full object-contain"
+        />
+      </motion.div>
+
+      {/* Centering the Heading with responsive font size */}
+      <div className="flex flex-col justify-center items-center mb-4">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+          Welcome to{" "}
+          <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
             Six
-          </h1>
-          <div className="max-w-xl mx-auto">
-            <p className="text-xl mb-1">Your AI matchmaker.</p>
-            <p className="text-xl mb-4">A friend or a date — you pick</p>
-            <div className="h-16 flex items-center justify-center">
-              <p className="text-xl font-medium">
-                <span>One </span>
-                <span className={`bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500 ${isDeleting ? 'invisible' : ''}`}>
-                  {text}
-                  <span className="animate-pulse text-blue-500">|</span>
-                </span>
-              </p>
-            </div>
-          </div>
+          </span>
+        </h1>
 
-          <Link href="/prefrence">
-            <Button className="rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white px-8 py-6 text-lg h-auto mt-4">
-              Start
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Chatbot Widget */}
-      <div className="fixed bottom-4 right-4 z-50"></div>
+        {/* Changing subheading with gradient and pulse effect */}
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 dark:text-gray-300">
+          {fixedWord}{" "}
+          <span
+            className={`inline-block transition-opacity duration-500 ${
+              fade ? "opacity-100" : "opacity-0"
+            } bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500`}
+          >
+            {changingWords[wordIndex]}
+            <span className="animate-pulse text-blue-500">|</span>
+          </span>
+        </h2>
+      </div>
     </main>
   )
 }

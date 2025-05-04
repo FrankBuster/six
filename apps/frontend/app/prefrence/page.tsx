@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function SelectionPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
@@ -29,7 +30,7 @@ export default function SelectionPage() {
         />
       </motion.div>
 
-      <h1 className="mb-8 text-xl md:text-2xl tracking-tight font-serif text-gray-800">
+      <h1 className="mb-8 text-xl md:text-2xl tracking-tight font-serif text-gray-800 dark:text-gray-300 transition-colors duration-300">
         I&apos;m looking for...
       </h1>
 
@@ -48,7 +49,7 @@ export default function SelectionPage() {
           </button>
         ))}
       </div>
-
+    <Link href="/results">
       <Button
         size="lg"
         className="text-xl px-8 py-6 font-serif text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 rounded-full transition duration-300 ease-in-out"
@@ -56,6 +57,7 @@ export default function SelectionPage() {
       >
         Next
       </Button>
+    </Link>
     </div>
   )
 }
