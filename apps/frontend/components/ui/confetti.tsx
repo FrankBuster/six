@@ -5,9 +5,9 @@ import confetti from "canvas-confetti"
 
 export function Confetti({ className }: { className?: string }) {
   useEffect(() => {
-    const duration = 5 * 1000 // 5 seconds
+    const duration = 6 * 1000 // 5 seconds
     const animationEnd = Date.now() + duration
-    const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"]
+    const colors = ["#8B0000", "#4A90E2", "#FF69B4", "#49ef2c"]
 
     // Function to fire confetti from a specific origin
     const fireConfetti = (origin: { x: number; y: number }) => {
