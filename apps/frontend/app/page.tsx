@@ -76,7 +76,7 @@ export default function Home() {
 
           <Link href="/prefrence">
             <Button className="rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white px-8 py-6 text-lg h-auto mt-4">
-              Start
+            Join The Waitlist
             </Button>
           </Link>
         </div>

@@ -42,7 +42,7 @@ export default function SignupPage() {
       </motion.div>
 
       <p className="text-center text-xl mb-4 opacity-80 -mt-2">
-        *the only form we&apos;ll ever ask you to fill
+        the only form we&apos;ll ever ask you to fill
       </p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
@@ -127,12 +127,14 @@ export default function SignupPage() {
         </p>
 
         <div className="pt-6">
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-pink-500 to-blue-500 hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block"
-          >
-            Join
-          </button>
+        <button
+  type="submit"
+  className="text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block -mt-6"
+>
+  Join
+</button>
+
+
         </div>
       </form>
     </main>
