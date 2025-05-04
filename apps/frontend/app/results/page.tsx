@@ -53,7 +53,7 @@ export default function Results() {
 
         {/* Extra Subheading */}
         <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400">
-          We’ll talk soon.
+          We’ll talk soon...
         </p>
 
         {/* Changing subheading */}
