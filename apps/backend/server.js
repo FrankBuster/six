@@ -413,37 +413,18 @@ async function sendSMS(phoneNumber, username) {
 
   try {
     const message = await twilioClient.messages.create({
-      body: `Hey ${username}, I'm Six! Looks like you missed my Instagram request - can you accept it real quick so I can call you :)`,
+      body: `Hey ${username}, I’m Six, your AI matchmaker!! Save my number — you’ll be hearing from me soon 🎉`,
       from: TWILIO_PHONE_NUMBER,
       to: formattedPhone
     });
+  
     console.log(`SMS sent to ${formattedPhone}, SID: ${message.sid}`);
     return true;
   } catch (error) {
     console.error('Error sending SMS:', error);
     return false;
   }
-}
 
-// Make phone call to user
-async function makePhoneCall(phoneNumber, name, instagramUsername) {
-  // Ensure phone number is in E.164 format
-  const formattedPhone = formatPhoneNumber(phoneNumber);
-  console.log(`Attempting to make call to ${formattedPhone}`);
-
-  try {
-    const call = await twilioClient.calls.create({
-      twiml: `<Response><Say>Hello ${name}, I am Six calling you from New York City, i can help you finiding your exact match.</Say></Response>`,
-      from: TWILIO_PHONE_NUMBER,
-      to: formattedPhone
-    });
-    console.log(`Call initiated to ${formattedPhone}, SID: ${call.sid}`);
-    return true;
-  } catch (error) {
-    console.error('Error making phone call:', error);
-    return false;
-  }
-}
 
 // Helper function to format phone numbers to E.164 format
 function formatPhoneNumber(phoneNumber) {
@@ -485,8 +466,7 @@ function pollFollowRequests() {
               console.error('SMS failed:', error.message);
             }
             
-            // Make phone call
-            await makePhoneCall(user.phoneNumber, user.name, username);
+            
             
             console.log(`Notifications sent to ${user.name} at ${user.phoneNumber}`);
           } else {
@@ -570,3 +550,4 @@ process.on('SIGINT', async () => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

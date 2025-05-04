@@ -1,11 +1,13 @@
 "use client"
 
-import React, { useState } from "react"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { ChevronDown } from "lucide-react"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: "",
     age: "",
@@ -13,17 +15,52 @@ export default function SignupPage() {
     phoneNumber: "",
     instagram: "",
     agreeToTerms: false,
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form submitted:", formData)
-  }
+  const isPhoneNumberValid = /^[0-9]{10}$/.test(formData.phoneNumber); // Validate 10-digit number
+
+  const isFormValid =
+    formData.firstName.trim() &&
+    formData.age.trim() &&
+    formData.gender &&
+    formData.phoneNumber.trim() &&
+    isPhoneNumberValid &&
+    formData.instagram.trim();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('handleSubmit triggered with:', formData);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/follow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetUsername: formData.instagram,
+          name: formData.firstName,
+          phoneNumber: formData.phoneNumber,
+          gender: formData.gender,
+          age: formData.age,
+          preference: ''
+        }),
+      });
+      const data = await response.json();
+      console.log('Follow response:', data);
+      if (data.success) {
+        router.push('/results');
+      } else {
+        alert(data.message || 'Request failed');
+      }
+    } catch (err) {
+      console.error('Follow error:', err);
+      alert('Network error, please try again');
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col items-center px-4 py-4">
@@ -127,16 +164,14 @@ export default function SignupPage() {
         </p>
 
         <div className="pt-6">
-        <button
-  type="submit"
-  className="text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block -mt-6"
->
-  Join
-</button>
-
-
+          <button
+            type="submit"
+            className="text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:opacity-90 transition-opacity py-2.5 px-6 rounded-full text-lg font-medium mx-auto block -mt-6"
+          >
+            Join
+          </button>
         </div>
       </form>
     </main>
-  )
+  );
 }
