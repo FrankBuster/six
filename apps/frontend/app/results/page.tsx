@@ -42,24 +42,28 @@ export default function Results() {
         />
       </motion.div>
 
-      {/* Heading with responsive font size */}
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-gray-900 dark:text-white whitespace-nowrap">
-        Welcome to{" "}
-        <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-          Six
-        </span>
-      </h1>
+      {/* Centering the Heading with responsive font size */}
+      <div className="flex flex-col justify-center items-center mb-4">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+          Welcome to{" "}
+          <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
+            Six
+          </span>
+        </h1>
 
-      {/* Changing subheading with gradient and pulse effect */}
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-medium h-10 text-gray-800 dark:text-gray-300">
-        {fixedWord}{" "}
-        <span
-          className={`inline-block transition-opacity duration-500 ${fade ? "opacity-100" : "opacity-0"} bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500`}
-        >
-          {changingWords[wordIndex]}
-          <span className="animate-pulse text-blue-500">|</span>
-        </span>
-      </h2>
+        {/* Changing subheading with gradient and pulse effect */}
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 dark:text-gray-300">
+          {fixedWord}{" "}
+          <span
+            className={`inline-block transition-opacity duration-500 ${
+              fade ? "opacity-100" : "opacity-0"
+            } bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500`}
+          >
+            {changingWords[wordIndex]}
+            <span className="animate-pulse text-blue-500">|</span>
+          </span>
+        </h2>
+      </div>
     </main>
   )
 }
