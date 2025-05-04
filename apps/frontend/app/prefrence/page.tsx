@@ -56,7 +56,7 @@ export default function SelectionPage() {
       <Link href="/signup">
         <Button
           size="lg"
-          className="text-xl px-8 py-6 font-serif text-white bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 rounded-full transition duration-300 ease-in-out"
+          className="rounded-full bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white px-8 py-6 text-lg h-auto mt-4"
           disabled={!selectedOption}
         >
           Next

@@ -48,7 +48,7 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
         <div className="space-y-2">
           <label htmlFor="firstName" className="text-lg font-light">
-            First name
+            Name
           </label>
           <input
             type="text"
@@ -57,7 +57,7 @@ export default function SignupPage() {
             value={formData.firstName}
             onChange={handleChange}
             className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
-            placeholder="First name"
+            placeholder="Enter your full name here"
           />
         </div>
 

@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Confetti } from "@/components/ui/confetti"
 
 export default function Results() {
-  const changingWords = [" forms", " quizzes", " surveys", " Swiping"]
+  const changingWords = [" forms", " quizzes","swiping"]
   const fixedWord = "No "
   const [wordIndex, setWordIndex] = useState(0)
   const [fade, setFade] = useState(true)
