@@ -55,7 +55,7 @@ export default function SignupPage() {
             value={formData.firstName}
             onChange={handleChange}
             className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
-            placeholder="First name"
+            placeholder=""
           />
         </div>
 
@@ -69,7 +69,7 @@ export default function SignupPage() {
               value={formData.age}
               onChange={handleChange}
               className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
-              placeholder="Age"
+              placeholder=""
             />
           </div>
 
@@ -104,7 +104,7 @@ export default function SignupPage() {
             value={formData.phoneNumber}
             onChange={handleChange}
             className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
-            placeholder="Enter your phone number"
+            placeholder=""
           />
         </div>
 
