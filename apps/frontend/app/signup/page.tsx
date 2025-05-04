@@ -26,7 +26,7 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center px-4 py-4">
+    <main className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col items-center px-4 py-4">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
@@ -41,7 +41,9 @@ export default function SignupPage() {
         />
       </motion.div>
 
-      <p className="text-center text-xl mb-4 opacity-80 -mt-2">the only form we&apos;ll ever ask you to fill</p>
+      <p className="text-center text-xl mb-4 opacity-80 -mt-2">
+        the only form we&apos;ll ever ask you to fill
+      </p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
         <div className="space-y-2">
@@ -54,7 +56,7 @@ export default function SignupPage() {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="First name"
           />
         </div>
@@ -70,12 +72,12 @@ export default function SignupPage() {
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+              className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
               placeholder="Age"
             />
           </div>
 
-         <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-2">
             <label htmlFor="gender" className="text-lg font-light">
               Gender
             </label>
@@ -84,7 +86,7 @@ export default function SignupPage() {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full bg-zinc-800/80 rounded-md px-4 py-[10px] text-white focus:outline-none"
+              className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white px-4 py-[10px] rounded-md focus:outline-none"
             >
               <option value="" disabled>Select...</option>
               <option value="male">Male</option>
@@ -104,7 +106,7 @@ export default function SignupPage() {
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="Enter your phone number"
           />
         </div>
@@ -119,12 +121,12 @@ export default function SignupPage() {
             name="instagram"
             value={formData.instagram}
             onChange={handleChange}
-            className="w-full bg-zinc-800/80 rounded-md px-4 py-2 text-white placeholder:text-zinc-500 focus:outline-none"
+            className="w-full bg-zinc-100 dark:bg-zinc-800/80 text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-md px-4 py-2 focus:outline-none"
             placeholder="Accept our request for verification"
           />
         </div>
 
-        <p className="pt-1 text-xs text-zinc-400 text-center leading-relaxed px-4">
+        <p className="pt-1 text-xs text-zinc-600 dark:text-zinc-400 text-center leading-relaxed px-4">
           *Disclaimer: our matching algorithm reads between the lines and decodes your voice, tone, energy – the little
           things even your therapist wouldn't get
         </p>

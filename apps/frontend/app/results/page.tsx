@@ -42,8 +42,8 @@ export default function Results() {
         />
       </motion.div>
 
-      {/* Centering the Heading with responsive font size */}
-      <div className="flex flex-col justify-center items-center mb-4">
+      {/* Main Headings */}
+      <div className="flex flex-col justify-center items-center mb-4 space-y-3">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
           Welcome to{" "}
           <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
@@ -51,7 +51,12 @@ export default function Results() {
           </span>
         </h1>
 
-        {/* Changing subheading with gradient and pulse effect */}
+        {/* Extra Subheading */}
+        <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400">
+          We’ll talk soon.
+        </p>
+
+        {/* Changing subheading */}
         <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-800 dark:text-gray-300">
           {fixedWord}{" "}
           <span
