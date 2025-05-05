@@ -1,12 +1,16 @@
 const dotenv = require('dotenv');
 const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const puppeteer = require('puppeteer');
+const twilio = require('twilio');
+const fs = require('fs');
 
 // Get the absolute path to the .env file
 const envPath = path.resolve(__dirname, '.env');
 console.log('Loading .env file from:', envPath);
 
 // Check if the .env file exists
-const fs = require('fs');
 if (fs.existsSync(envPath)) {
   console.log('.env file exists at the specified path');
 } else {
@@ -21,18 +25,13 @@ if (result.error) {
   console.log('.env file loaded successfully');
 }
 
-const express = require('express');
-const cors = require('cors');
-const puppeteer = require('puppeteer');
-// const fs = require('fs');
-const twilio = require('twilio');
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')); // Serve static files from 'public' directory
 
 const INSTAGRAM_USERNAME = process.env.IG_USERNAME;
 const INSTAGRAM_PASSWORD = process.env.IG_PASSWORD;
@@ -50,13 +49,17 @@ console.log('TWILIO_ACCOUNT_SID exists:', !!process.env.TWILIO_ACCOUNT_SID);
 console.log('TWILIO_AUTH_TOKEN exists:', !!process.env.TWILIO_AUTH_TOKEN);
 console.log('TWILIO_PHONE_NUMBER exists:', !!process.env.TWILIO_PHONE_NUMBER);
 
+// Import PostgreSQL models
+const { User, syncDatabase } = require('./models/sequelize');
+
+// Initialize PostgreSQL database
+syncDatabase()
+  .then(() => console.log('PostgreSQL database initialized'))
+  .catch(err => console.error('PostgreSQL initialization error:', err));
+
 let browser = null;
 let page = null;
 let isInitializing = false;
-
-// In-memory database for users and follow requests
-let usersDatabase = {};
-let pendingFollowRequests = {}; // In-memory storage for pending follow requests
 
 async function saveCookies(page) {
   try {
@@ -326,7 +329,6 @@ async function followUser(targetUsername) {
   }
 }
 
-// Check if a user has accepted our follow request
 async function checkFollowRequestAccepted(username) {
   console.log(`Checking if ${username} has accepted our follow request...`);
   
@@ -405,8 +407,6 @@ async function checkFollowRequestAccepted(username) {
   }
 }
 
-// Send SMS notification to user
-// Send SMS notification to user
 async function sendSMS(phoneNumber, username) {
   // Ensure phone number is in E.164 format
   const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -425,11 +425,8 @@ async function sendSMS(phoneNumber, username) {
     console.error('Error sending SMS:', error);
     return false;
   }
-} // ← this closing brace was missing
+}
 
-
-
-// Helper function to format phone numbers to E.164 format
 function formatPhoneNumber(phoneNumber) {
   let cleaned = phoneNumber.replace(/\D/g, '');
   // If it's a local 10-digit number, add default country code
@@ -440,57 +437,64 @@ function formatPhoneNumber(phoneNumber) {
   return '+' + cleaned;
 }
 
-function pollFollowRequests() {
-  // Poll every 2 minutes
+async function pollFollowRequests() {
   setInterval(async () => {
     console.log('Polling for follow request acceptance...');
 
-    for (const [username, userData] of Object.entries(pendingFollowRequests)) {
-      console.log(`Checking follow status for ${username}...`);
-      try {
-        await initializeBrowser();
-        
-        // Check if the user has accepted our follow request
-        const isAccepted = await checkFollowRequestAccepted(username);
-        
-        if (isAccepted) {
-          console.log(`${username} has accepted our follow request!`);
-          
-          // Get user data from our database
-          const user = usersDatabase[username];
-          
-          if (user && user.phoneNumber) {
-            console.log(`Attempting SMS to ${user.phoneNumber} for user @${username}`);
-            
-            try {
-              await sendSMS(user.phoneNumber, username);
-              console.log(`SMS successfully sent to ${user.phoneNumber}`);
-            } catch (error) {
-              console.error('SMS failed:', error.message);
-            }
-            
-            
-            
-            console.log(`Notifications sent to ${user.name} at ${user.phoneNumber}`);
-          } else {
-            console.log(`No phone number found for ${username}`);
-          }
-          
-          // Remove from pending requests
-          delete pendingFollowRequests[username];
+    try {
+      // Get all users with pending follow requests from PostgreSQL
+      const pendingUsers = await User.findAll({ 
+        where: { 
+          followRequestSent: true, 
+          followRequestAccepted: false,
+          smsSent: false
         }
-      } catch (error) {
-        console.error(`Error processing follow request for ${username}:`, error);
+      });
+      
+      for (const user of pendingUsers) {
+        const username = user.instagram;
+        
+        if (username) {
+          try {
+            await initializeBrowser();
+            
+            // Check if the follow request was accepted
+            const accepted = await checkFollowRequestAccepted(username);
+            
+            if (accepted) {
+              console.log(`Follow request accepted by ${username}!`);
+              
+              // Send SMS notification
+              try {
+                console.log(`Sending SMS to ${user.phoneNumber}...`);
+                await sendSMS(user.phoneNumber, user.firstName || username);
+                console.log(`SMS successfully sent to ${user.phoneNumber}`);
+                
+                // Update user in PostgreSQL
+                await User.update(
+                  { followRequestAccepted: true, smsSent: true },
+                  { where: { instagram: username } }
+                );
+              } catch (error) {
+                console.error('SMS failed:', error.message);
+              }
+            }
+          } catch (error) {
+            console.error(`Error checking follow status for ${username}:`, error.message);
+          }
+        }
       }
+    } catch (error) {
+      console.error('Error in polling:', error);
     }
-  }, 2 * 60 * 1000);  // Poll every 2 minutes
+  }, 60000); // Check every minute
 }
 
 // Start polling for follow requests
 pollFollowRequests();
 
 app.post('/api/follow', async (req, res) => {
-  const { targetUsername, name, phoneNumber, gender, age, preference } = req.body;
+  const { targetUsername, name, phoneNumber, gender, age, preference, lookingFor } = req.body;
 
   if (!targetUsername) {
     return res.status(400).json({ error: 'Username is required' });
@@ -502,23 +506,52 @@ app.post('/api/follow', async (req, res) => {
   try {
     await initializeBrowser();
 
-    // Store user information in our database
-    usersDatabase[cleanUsername] = {
-      name,
+    // Store user information in PostgreSQL
+    const userData = {
+      firstName: name,
       phoneNumber,
       gender,
       age,
-      preference,
-      createdAt: Date.now()
+      instagram: cleanUsername,
+      preference: preference || '',
+      lookingFor: lookingFor || '',
+      followRequestSent: false
     };
-
-    // Store the follow request in memory
-    pendingFollowRequests[cleanUsername] = Date.now();
+    
+    // Check if user already exists
+    let user = await User.findOne({ where: { instagram: cleanUsername } });
+    
+    if (user) {
+      // Update existing user
+      await User.update(
+        userData,
+        { where: { instagram: cleanUsername } }
+      );
+      // Get the updated user
+      user = await User.findOne({ where: { instagram: cleanUsername } });
+      console.log('Updated existing user in PostgreSQL:', user.instagram);
+    } else {
+      // Create new user
+      user = await User.create(userData);
+      console.log('Created new user in PostgreSQL:', user.instagram);
+    }
 
     // Try to follow the user
     const success = await followUser(cleanUsername);
+    
+    // Update follow request status in database
+    if (success) {
+      await User.update(
+        { followRequestSent: true },
+        { where: { instagram: cleanUsername } }
+      );
+      console.log('Updated followRequestSent status for user:', cleanUsername);
+    }
 
     if (success) {
+      // Send SMS via Twilio
+      await sendSMS(phoneNumber, name || cleanUsername);
+      
       res.json({ 
         success: true, 
         message: `Successfully sent follow request to ${cleanUsername}. We'll notify you when they accept.` 
@@ -553,4 +586,3 @@ process.on('SIGINT', async () => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

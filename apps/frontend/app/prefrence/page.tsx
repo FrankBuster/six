@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,19 @@ export default function SelectionPage() {
     { id: "friend", label: "A Friend" },
     { id: "date", label: "A Date" },
   ]
+
+  const handleOptionSelect = (optionId: string) => {
+    setSelectedOption(optionId);
+    // Save to localStorage
+    localStorage.setItem('userPreference', optionId);
+  }
+
+  useEffect(() => {
+    const storedPreference = localStorage.getItem('userPreference');
+    if (storedPreference) {
+      setSelectedOption(storedPreference);
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 text-center bg-white dark:bg-black transition-colors duration-300">
@@ -41,7 +54,7 @@ export default function SelectionPage() {
         {options.map((option) => (
           <button
             key={option.id}
-            onClick={() => setSelectedOption(option.id)}
+            onClick={() => handleOptionSelect(option.id)}
             className={`w-full px-6 py-4 rounded-full border-2 text-xl mb-1 transition-all duration-300 ${
               selectedOption === option.id
                 ? "border-4 border-pink-500"

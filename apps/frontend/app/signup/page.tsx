@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -16,6 +16,18 @@ export default function SignupPage() {
     instagram: "",
     agreeToTerms: false,
   });
+
+  // State to store the preference from localStorage
+  const [userPreference, setUserPreference] = useState("");
+
+  // Get preference from localStorage on component mount
+  useEffect(() => {
+    // Need to use this pattern because localStorage is not available during SSR
+    const storedPreference = typeof window !== 'undefined' ? localStorage.getItem('userPreference') : null;
+    if (storedPreference) {
+      setUserPreference(storedPreference);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -46,7 +58,7 @@ export default function SignupPage() {
           phoneNumber: formData.phoneNumber,
           gender: formData.gender,
           age: formData.age,
-          preference: ''
+          lookingFor: userPreference || ''
         }),
       });
       const data = await response.json();
